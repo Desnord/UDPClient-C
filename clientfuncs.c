@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "listas.h"
 #include "clientfuncs.h"
 
@@ -39,9 +38,6 @@ void printPerfil(Perfil *p)
 }
 void printListaPerfil(NoPerfil *lista)
 {
-    if(lista == NULL)
-        return;
-
     printf("\n");
     NoPerfil *at;
     at = lista->prox;
@@ -58,9 +54,6 @@ void printListaPerfil(NoPerfil *lista)
 }
 void printListaNomeEmail(NoPerfilEmailNome *lista)
 {
-    if(lista == NULL)
-        return;
-
     printf("\n");
     NoPerfilEmailNome *at;
     at = lista->prox;
@@ -78,9 +71,6 @@ void printListaNomeEmail(NoPerfilEmailNome *lista)
 }
 void printListaNomeEmailCurso(NoPerfilEmailNomeCurso *lista)
 {
-    if(lista == NULL)
-        return;
-
     printf("\n");
     NoPerfilEmailNomeCurso *at;
     at = lista->prox;
@@ -97,6 +87,8 @@ void printListaNomeEmailCurso(NoPerfilEmailNomeCurso *lista)
     }
     printf("\n");
 }
+
+/* ---------------------------- funcoes basicas do cliente [IMPRIMIR Extras] ------------------------- */
 void printResp(char res, int op)
 {
     if(op == 5)
@@ -136,46 +128,20 @@ void printResp(char res, int op)
             PRINTCL(CLLR,"Erro ao receber confirmacao. \n\n");
     }
 }
-/* --------------------------- funcoes basicas do cliente [IMPRIMIR / Extras] ------------------------ */
-void printConnStatus(char t, char *ip)
-{
-    if(t == 'E')
-    {
-        PRINT2C(" erro de conexão.\n",CLLR,CLW," pressione uma tecla para encerrar...");
-        getchar();
-        exit(0);
-    }
-    else
-        PRINT2C("conectado ao servidor: ",CLLG,CLY,"%s\n",ip);
-}
-void printMenu(char *user)
+void printMenu(int tipo)
 {
     PRINTCL(CLLB,"-------------------------------------------------------------------------------------------\n");
-          printf("| [0] - para sair                                                                         |\n");
-          printf("| [1] - listar todas as pessoas (email e nome) formadas em um determinado curso           |\n");
-          printf("| [2] - listar todas as pessoas (email e nome) que possuam uma determinada habilidade     |\n");
-          printf("| [3] - listar todas as pessoas (email, nome e curso) formadas em um determinado ano      |\n");
-          printf("| [4] - listar todas as informações de todos os perfis                                    |\n");
-          printf("| [5] - dado o email de um perfil, retornar suas informações                              |\n");
-    if(!strcmp(user,"Admin"))
+         printf("| [0] - para sair                                                                         |\n");
+         printf("| [1] - listar todas as pessoas (email e nome) formadas em um determinado curso           |\n");
+         printf("| [2] - listar todas as pessoas (email e nome) que possuam uma determinada habilidade     |\n");
+         printf("| [3] - listar todas as pessoas (email, nome e curso) formadas em um determinado ano      |\n");
+         printf("| [4] - listar todas as informações de todos os perfis                                    |\n");
+         printf("| [5] - dado o email de um perfil, retornar suas informações                              |\n");
+    if(tipo)
     {
-          printf("| [6] - cadastrar um novo perfil utilizando o email como identificador                    |\n");
-          printf("| [7] - acrescentar uma nova experiência profissional em um perfil                        |\n");
-          printf("| [8] - remover um perfil a partir de seu identificador (email)                           |\n");
+         printf("| [6] - cadastrar um novo perfil utilizando o email como identificador                    |\n");
+         printf("| [7] - acrescentar uma nova experiência profissional em um perfil                        |\n");
+         printf("| [8] - remover um perfil a partir de seu identificador (email)                           |\n");
     }
     PRINTCL(CLLB,"-------------------------------------------------------------------------------------------\n");
-}
-int getConfig(char *ip, char *user)
-{
-    // config [le ip, porta e usuario do arquivo]
-    FILE *config = fopen("config.txt","r");
-    int port = 9000;
-    if(config != NULL)
-    {
-        fscanf(config,"%s",user);
-        fscanf(config,"%s",ip);
-        fscanf(config,"%d",&port);
-        fclose(config);
-    }
-    return port;
 }
