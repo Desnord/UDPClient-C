@@ -30,8 +30,6 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
 		printf("Escolha uma opção: ");
 		gets(OPBuffer);
 		printf("\n");
-	
-		sendto(socketFD, OPBuffer, 200, 0, (SockAddr*)&server, sizeof(server));
 		
 		// [usuario nao eh o admin, entao apenas ignora que ele digitou uma opcao privilegiada]
 		if(strcmp(user,"Admin") != 0 && (!strcmp(OPBuffer,"6") || !strcmp(OPBuffer,"7") || !strcmp(OPBuffer,"8") || !strcmp(OPBuffer,"ENCERRAR")))
@@ -44,8 +42,12 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
 			break;
 		}
 		else // envia operacao ao servidor + recebe resposta
-		{
+		{		
 			sendto(socketFD, OPBuffer, 200, 0, (SockAddr*)&server, sizeof(server));
+			system("clear");
+
+			if(!strcmp(OPBuffer,"ENCERRAR")) // encerrar programa + servidor
+				break;
 		}
     }
 }
