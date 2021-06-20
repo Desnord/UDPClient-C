@@ -379,7 +379,7 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
         system("clear");
         continue;
       }
-      else if(!strcmp(OPBuffer,"0") || (!strcmp(OPBuffer,"ENCERRAR") && strcmp(user,"Admin"))) // encerrar programa
+      else if(!strcmp(OPBuffer,"0") || (!strcmp(OPBuffer,"ENCERRAR") && !strcmp(user,"Admin"))) // encerrar programa
       {
   			break;
       }
