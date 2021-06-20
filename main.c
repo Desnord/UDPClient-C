@@ -379,9 +379,15 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
         system("clear");
         continue;
       }
-      else if(!strcmp(OPBuffer,"0") || (!strcmp(OPBuffer,"ENCERRAR") && !strcmp(user,"Admin"))) // encerrar programa
+      else if(!strcmp(OPBuffer,"0")) // encerrar programa
       {
   			break;
+      }
+      else if(!strcmp(OPBuffer,"ENCERRAR") && !strcmp(user,"Admin"))
+      {
+        int len = sizeof(server);
+        enviaMSG(socketFD,server);
+        break;
       }
   		else // envia operacao ao servidor + recebe resposta
   		{
@@ -390,12 +396,11 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
         enviaMSG(socketFD,server);        // envia mensagem ao servidor
         recebeMSG(socketFD,server,&len);  // recebe resposta do servidor
         imprimeMSG(OPBuffer);             // imprime informacao de acordo com a mensagem recebida
+        printf("Pressione uma tecla para continuar...");
+        getchar();
+        printf("\n");
+        system("clear");
   		}
-
-      printf("Pressione uma tecla para continuar...");
-      getchar();
-      printf("\n");
-      system("clear");
     }
 }
 
