@@ -31,24 +31,32 @@ void leituraMSG(char *OptBuffer) // leitura dos dados de cada opcao possivel (de
         else
           printf("digite a habilidade: ");
 
-        gets(str);
+        fgets(str,100,stdin);
+		if(str[strlen(str)-1] == '\n') str[strlen(str)-1] = '\0';
+		
         fprintf(temp,"%s\n", str);
     }
     else if(!strcmp(OptBuffer,"3"))
     {
         int ano;
         char str[100];
-		    memset(str,'\0',200);
+		
         printf("digite o ano: ");
-        gets(str);
-        ano = (int)strtol(str, (char **)NULL, 10);
+		
+        fgets(str,100,stdin);
+		if(str[strlen(str)-1] == '\n') str[strlen(str)-1] = '\0';
+        
+		ano = (int)strtol(str, (char **)NULL, 10);
         fprintf(temp,"%d\n", ano);
     }
     else if(!strcmp(OptBuffer,"5"))
     {
         char str[100];
         printf("digite o email: ");
-        gets(str);
+		
+        fgets(str,100,stdin);
+		if(str[strlen(str)-1] == '\n') str[strlen(str)-1] = '\0';
+		
         fprintf(temp,"%s\n", str);
     }
     else if(!strcmp(OptBuffer,"6"))
@@ -59,7 +67,10 @@ void leituraMSG(char *OptBuffer) // leitura dos dados de cada opcao possivel (de
         {
           infos[i] = malloc(sizeof(char)*200);
           printf("Digite %s: ",labels[i]);
-          gets(infos[i]);
+		  
+          fgets(infos[i],200,stdin);
+		  if(infos[i][strlen(infos[i])-1] == '\n') infos[i][strlen(infos[i])-1] = '\0';
+		  
         }
 
         // aloca memoria para os dados mais complexos
@@ -69,31 +80,45 @@ void leituraMSG(char *OptBuffer) // leitura dos dados de cada opcao possivel (de
         // leitura dos dados mais complexos
   			char opt2[20];
   			printf("Inserir habilidade (s) ou (n): ");
-  			gets(opt2);
+			
+  			fgets(opt2,20,stdin);
+			if(opt2[strlen(opt2)-1] == '\n') opt2[strlen(opt2)-1] = '\0';
 
         while (!strcmp(opt2,"s"))
 				{
 					printf("Digite uma habilidade: ");
 					char *exphab = malloc(sizeof(char)*100);
-					gets(exphab);
+					
+					fgets(exphab,100,stdin);
+					if(exphab[strlen(exphab)-1] == '\n') exphab[strlen(exphab)-1] = '\0';
+					
 					!existeString(exphab,auxhab) ? stringListInsert(auxhab,exphab) : free(exphab);
 
-					printf("Continuar inserindo habilidades (s) ou (n): ");
-					gets(opt2);
+					printf("Continuar inserindo habilidades (s) ou (n): ");	
+					
+					fgets(opt2,20,stdin);
+					if(opt2[strlen(opt2)-1] == '\n') opt2[strlen(opt2)-1] = '\0';
 				}
 
         printf("Inserir experiência (s) ou (n): ");
-  			gets(opt2);
+  			
+		fgets(opt2,20,stdin);
+		if(opt2[strlen(opt2)-1] == '\n') opt2[strlen(opt2)-1] = '\0';
+		
         while (!strcmp(opt2,"s"))
-				{
-					printf("Digite uma experiência: ");
-					char *exphab = malloc(sizeof(char)*100);
-					gets(exphab);
-					!existeString(exphab,auxexp) ? stringListInsert(auxexp,exphab) : free(exphab);
+		{
+			printf("Digite uma experiência: ");
+			
+			char *exphab = malloc(sizeof(char)*100);
+			fgets(exphab,100,stdin);
+			
+			if(exphab[strlen(exphab)-1] == '\n') exphab[strlen(exphab)-1] = '\0';
+			!existeString(exphab,auxexp) ? stringListInsert(auxexp,exphab) : free(exphab);
 
-					printf("Continuar inserindo experiência (s) ou (n): ");
-					gets(opt2);
-				}
+			printf("Continuar inserindo experiência (s) ou (n): ");
+			fgets(opt2,20,stdin);
+			if(opt2[strlen(opt2)-1] == '\n') opt2[strlen(opt2)-1] = '\0';
+		}
 
         for(int i=0; i<5; i++)
         {
@@ -122,10 +147,15 @@ void leituraMSG(char *OptBuffer) // leitura dos dados de cada opcao possivel (de
     {
         char eml[100];
         printf("digite o email: ");
-        gets(eml);
-        char exp[100];
+		
+        fgets(eml,100,stdin);
+		if(eml[strlen(eml)-1] == '\n') eml[strlen(eml)-1] = '\0';
+        
+		char exp[100];
         printf("digite a experiencia: ");
-        gets(exp);
+		
+        fgets(exp,100,stdin);
+		if(exp[strlen(exp)-1] == '\n') exp[strlen(exp)-1] = '\0';
 
         fprintf(temp,"%s\n", eml);
         fprintf(temp,"%s\n", exp);
@@ -134,7 +164,10 @@ void leituraMSG(char *OptBuffer) // leitura dos dados de cada opcao possivel (de
     {
         char str[100];
         printf("digite o email: ");
-        gets(str);
+		
+        fgets(str,100,stdin);
+		if(str[strlen(str)-1] == '\n') str[strlen(str)-1] = '\0';
+		
         fprintf(temp,"%s\n", str);
     }
     fclose(temp);
@@ -156,7 +189,7 @@ void enviaMSG(int socketFD, SockAddr_in server) // envio dos dados do arquivo te
     remove(TEMP);
 }
 
-void recebeMSG(int socketFD, SockAddr_in server, int *len) // recebimento da mensagem do servidor, dados ou resposta da operacao (gera arquivo temporario com os dados)
+void recebeMSG(int socketFD, SockAddr_in server, unsigned int *len) // recebimento da mensagem do servidor, dados ou resposta da operacao (gera arquivo temporario com os dados)
 {
     FILE *temp = fopen(TEMP, "w");
     for(;;)
@@ -264,7 +297,79 @@ void imprimeMSG(char *OptBuffer)
     }
     else if(!strcmp(OptBuffer,"4"))
     {
-      NoPerfil *lista = newPerfilList();
+       NoPerfil *lista = newPerfilList();
+       Perfil *p = newPerfil();
+       int ctd = 0;
+       char line[200];
+       memset(line, 0, 200);
+       while(fgets(line,200,temp))
+       {
+            line[(int)strlen(line)-1] = '\0';
+
+            if(!strcmp(line,"NULL"))
+            {
+                free(p);
+                printResp('0',5);
+                return;
+            }
+
+            if(ctd < 5)
+            {
+                char *campo = malloc(sizeof(char) * ((int)strlen(line)+1));
+
+                if(!ctd)
+                    p->email = campo;
+                else if(ctd == 1)
+                    p->nome = campo;
+                else if(ctd == 2)
+                    p->sobrenome = campo;
+                else if(ctd == 3)
+                    p->cidade_residencia = campo;
+                else if(ctd == 4)
+                    p->formacao = campo;
+
+                strcpy(campo,line);
+                ctd++;
+            }
+            else if(ctd == 5)
+            {
+                p->ano_formatura = (int)strtol(line,NULL,10);
+                ctd++;
+            }
+            else if(ctd < 8)
+            {
+                NoString *STRlist =  p->habilidades;
+                if(!strcmp(line,"+=====+"))
+                    ctd++;
+                else
+                {
+                    char *strAUX = malloc(sizeof(char) * ((int)strlen(line)+1));
+                    strcpy(strAUX, line);
+
+                    // insere na lista de habilidades/experiencia
+                    stringListInsert(STRlist, strAUX);
+                }
+            }
+            else
+            {
+                NoString *STRlist = p->experiencia;
+                if(!strcmp(line,"+=====+"))
+                    ctd++;
+                else
+                {
+                    char *strAUX = malloc(sizeof(char) * ((int)strlen(line)+1));
+                    strcpy(strAUX, line);
+
+                    // insere na lista de habilidades/experiencia
+                    stringListInsert(STRlist, strAUX);
+                }
+            }
+			if(ctd >= 9){
+				perfilListInsert(lista,p);				
+				ctd = 0;
+				p = newPerfil();
+			}
+      }
       printListaPerfil(lista);
       perfilListFree(lista);
     }
@@ -368,7 +473,9 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
   		printMenu(!strcmp(user,"Admin"));
 
   		printf("Escolha uma opção: ");
-  		gets(OPBuffer);
+  		
+        fgets(OPBuffer,200,stdin);
+		if(OPBuffer[strlen(OPBuffer)-1] == '\n') OPBuffer[strlen(OPBuffer)-1] = '\0';
   		printf("\n");
 
       // [usuario nao eh o admin, entao apenas ignora que ele digitou uma opcao privilegiada]
@@ -386,13 +493,12 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
       }
       else if(!strcmp(OPBuffer,"ENCERRAR") && !strcmp(user,"Admin"))
       {
-        int len = sizeof(server);
         enviaMSG(socketFD,server);
         break;
       }
   		else // envia operacao ao servidor + recebe resposta
   		{
-        int len = sizeof(server);
+        unsigned int len = sizeof(server);
         leituraMSG(OPBuffer);             // realiza leitura dos dados da opcao (quando houver) e cria arquivo temp para enviar ao servidor
         enviaMSG(socketFD,server);        // envia mensagem ao servidor
         recebeMSG(socketFD,server,&len);  // recebe resposta do servidor

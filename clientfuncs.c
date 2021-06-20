@@ -6,6 +6,7 @@
 /* ------------------------ funcoes basicas do cliente [IMPRIMIR INFORMAÇÕES] ------------------------ */
 void printListaString(NoString *lista)
 {
+	if(!lista) return;
     NoString *n_at;
     n_at = lista->prox;
     int ctd = 1;
