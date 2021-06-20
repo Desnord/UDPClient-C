@@ -144,11 +144,13 @@ void enviaMSG(int socketFD, SockAddr_in server) // envio dos dados do arquivo te
 {
     FILE *temp = fopen(TEMP, "r");
     char line[200];
-
+    memset(line,'\0',200);
     while(fgets( line, 200, temp) != NULL)
-        sendto(socketFD, line, sizeof(line), 0, (SockAddr*)&server, sizeof(server));
+        sendto(socketFD, line, 200, 0, (SockAddr*)&server, sizeof(server));
+
+    memset(line,'\0',200);
     strcpy(line,"EOF");
-    sendto(socketFD,  line, sizeof(line), 0, (SockAddr*)&server, sizeof(server));
+    sendto(socketFD,  line, 200, 0, (SockAddr*)&server, sizeof(server));
 
     fclose(temp);
     remove(TEMP);
