@@ -156,16 +156,16 @@ void enviaMSG(int socketFD, SockAddr_in server) // envio dos dados do arquivo te
     remove(TEMP);
 }
 
-// recebimento da mensagem do servidor, dados ou resposta da operacao (gera arquivo temporario com os dados)
-void recebeMSG(int socketFD, SockAddr_in server, int *len)
+void recebeMSG(int socketFD, SockAddr_in server, int *len) // recebimento da mensagem do servidor, dados ou resposta da operacao (gera arquivo temporario com os dados)
 {
     FILE *temp = fopen(TEMP, "w");
     for(;;)
     {
         char RBuffer[200];
-        memset(RBuffer, 0, sizeof(RBuffer));
-        recvfrom(socketFD, RBuffer, sizeof(RBuffer), 0, (SockAddr*)&server, len);
-        if (strcmp(RBuffer, "EOF") == 0)
+        memset(RBuffer, '\0', 200);
+        recvfrom(socketFD, RBuffer, 200, 0, (SockAddr*)&server, len);
+        //printf("%s\n", RBuffer);
+        if (!strcmp(RBuffer, "EOF"))
             break;
         fprintf(temp, "%s", RBuffer);
     }
@@ -179,20 +179,18 @@ void imprimeMSG(char *OptBuffer)
 
     if(!strcmp(OptBuffer,"1") || !strcmp(OptBuffer,"2"))
     {
-        NoPerfilEmailNome *lista = malloc(sizeof(NoPerfilEmailNome));
-        lista->perfil = NULL;
-        lista->prox = NULL;
+        NoPerfilEmailNome *lista = newNPENList();
 
         char line[200],email[100],nome[100],sobrenome[100];
         int ctd = 0;
-        while(fgets(line,200,temp))
+        while(fgets(line,200,temp) != NULL)
         {
+            line[(int)strlen(line)-1] = '\0';
             if(!strcmp(line,"NULL"))
             {
-                lista = NULL;
-                break;
+              break;
             }
-            else if(!strcmp(line,"+=========+"))
+            else if(!strcmp(line,"+=====+"))
             {
                 PerfilEmailNome *p = malloc(sizeof(PerfilEmailNome));
                 p->email = malloc((strlen(email)+1)*sizeof(char));
@@ -207,15 +205,12 @@ void imprimeMSG(char *OptBuffer)
             }
             else
             {
-                line[(int)strlen(line)-1] = '\0';
-
                 if(!ctd)
                     strcpy(email,line);
                 else if(ctd == 1)
                     strcpy(nome,line);
                 else if(ctd == 2)
                     strcpy(sobrenome,line);
-
                 ctd++;
             }
         }
@@ -224,20 +219,18 @@ void imprimeMSG(char *OptBuffer)
     }
     else if(!strcmp(OptBuffer,"3"))
     {
-        NoPerfilEmailNomeCurso *lista = malloc(sizeof(NoPerfilEmailNomeCurso));
-        lista->perfil = NULL;
-        lista->prox = NULL;
+        NoPerfilEmailNomeCurso *lista = newNPENCList();
 
         char line[200],email[100],nome[100],sobrenome[100],curso[100];
         int ctd = 0;
         while(fgets(line,200,temp))
         {
+            line[(int)strlen(line)-1] = '\0';
             if(!strcmp(line,"NULL"))
             {
-                lista = NULL;
-                break;
+              break;
             }
-            else if(!strcmp(line,"+=========+"))
+            else if(!strcmp(line,"+=====+"))
             {
                 PerfilEmailNomeCurso *p = malloc(sizeof(PerfilEmailNomeCurso));
                 p->email = malloc((strlen(email)+1)*sizeof(char));
@@ -253,8 +246,6 @@ void imprimeMSG(char *OptBuffer)
             }
             else
             {
-                line[(int)strlen(line)-1] = '\0';
-
                 if(!ctd)
                     strcpy(email,line);
                 else if(ctd == 1)
@@ -272,18 +263,13 @@ void imprimeMSG(char *OptBuffer)
     }
     else if(!strcmp(OptBuffer,"4"))
     {
-
+      NoPerfil *lista = newPerfilList();
+      printListaPerfil(lista);
+      perfilListFree(lista);
     }
     else if(!strcmp(OptBuffer,"5"))
     {
-        Perfil *p = (Perfil*)malloc(sizeof(Perfil));
-        p->experiencia = (NoString *)malloc(sizeof(NoString));
-        p->habilidades = (NoString *)malloc(sizeof(NoString));
-        p->habilidades->str = NULL;
-        p->habilidades->prox = NULL;
-        p->experiencia->str = NULL;
-        p->experiencia->prox = NULL;
-
+        Perfil *p = newPerfil();
         int ctd = 0;
         char line[200];
         memset(line, 0, 200);
@@ -318,18 +304,16 @@ void imprimeMSG(char *OptBuffer)
             }
             else if(ctd == 5)
             {
-                line[(int)strlen(line)-1] = '\0';
                 p->ano_formatura = (int)strtol(line,NULL,10);
                 ctd++;
             }
             else if(ctd < 8)
             {
                 NoString *STRlist =  p->habilidades;
-                if(!strcmp(line,"+=========+"))
+                if(!strcmp(line,"+=====+"))
                     ctd++;
                 else
                 {
-                    line[(int)strlen(line)-1] = '\0';
                     char *strAUX = malloc(sizeof(char) * ((int)strlen(line)+1));
                     strcpy(strAUX, line);
 
@@ -340,11 +324,10 @@ void imprimeMSG(char *OptBuffer)
             else
             {
                 NoString *STRlist = p->experiencia;
-                if(!strcmp(line,"+=========+"))
+                if(!strcmp(line,"+=====+"))
                     ctd++;
                 else
                 {
-                    line[(int)strlen(line)-1] = '\0';
                     char *strAUX = malloc(sizeof(char) * ((int)strlen(line)+1));
                     strcpy(strAUX, line);
 
@@ -359,9 +342,14 @@ void imprimeMSG(char *OptBuffer)
     }
     else if(!strcmp(OptBuffer,"6") || !strcmp(OptBuffer,"7") || !strcmp(OptBuffer,"8"))
     {
-        char line[10] = "N";
-        if(fgets(line,10,temp))
-            printResp(OptBuffer[0], (int)line[0]);
+        char line[200];
+        memset(line,'\0',200);
+
+        if(fgets(line,200,temp) != NULL)
+        {
+          printf("%s\n",line);
+          printResp(line[0], (int)OptBuffer[0]-48);
+        }
     }
     fclose(temp);
     remove(TEMP);
@@ -397,10 +385,11 @@ void comunicacao(int socketFD, char *user, SockAddr_in server)
       }
   		else // envia operacao ao servidor + recebe resposta
   		{
+        int len = sizeof(server);
         leituraMSG(OPBuffer);             // realiza leitura dos dados da opcao (quando houver) e cria arquivo temp para enviar ao servidor
         enviaMSG(socketFD,server);        // envia mensagem ao servidor
-        //recebeMSG(socketFD,server,&len);  // recebe resposta do servidor
-        //imprimeMSG(OPBuffer);             // imprime informacao de acordo com a mensagem recebida
+        recebeMSG(socketFD,server,&len);  // recebe resposta do servidor
+        imprimeMSG(OPBuffer);             // imprime informacao de acordo com a mensagem recebida
   		}
 
       printf("Pressione uma tecla para continuar...");
