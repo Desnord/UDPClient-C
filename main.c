@@ -236,6 +236,7 @@ void imprimeMSG(char *OptBuffer)
                 p->email = malloc((strlen(email)+1)*sizeof(char));
                 p->nome = malloc((strlen(nome)+1)*sizeof(char));
                 p->sobrenome = malloc((strlen(sobrenome)+1)*sizeof(char));
+				p->formacao = malloc((strlen(curso)+1)*sizeof(char));
 
                 strcpy(p->email,email);
                 strcpy(p->nome,nome);
